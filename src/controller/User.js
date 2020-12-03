@@ -207,9 +207,10 @@ module.exports = {
   },
   updatePhone: async function (req, res) {
     try {
-      const id = req.token;
-      const phoneNumber = req.body.phoneNumber;
-      const result = await userModel.updatePhone(id.id, phoneNumber);
+      const {id} = req.token;
+      const {phoneNumber} = req.body;
+      console.log(phoneNumber,id)
+      const result = await userModel.updatePhone(id, phoneNumber);
       if (result.affectedRows > 0) {
         res.status(200).send({
           message: `Success update phone`,
