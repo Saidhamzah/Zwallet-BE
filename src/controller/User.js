@@ -102,10 +102,11 @@ module.exports = {
       const page = req.query.page || 0;
       const token = req.token;
       // console.log(token);
-      const [result, history] = await Promise.all([
-        userModel.home(token),
-        userModel.homehistory(token, search, sortBy, sortType, limit, page),
-      ]);
+      const result= await userModel.homehistory(token, search, sortBy, sortType, limit, page)
+      // const [result, history] = await Promise.all([
+      //   userModel.home(token),
+      //   userModel.homehistory(token, search, sortBy, sortType, limit, page),
+      // ]);
       // console.log(result, "result");
       // console.log(history, "result");
       // console.log(history.length,"result")
@@ -115,7 +116,7 @@ module.exports = {
           res.status(200).send({
             success: true,
             message: "success get data",
-            data: { result, data: history },
+            data: result,
           });
         } else {
           res.status(200).send({
