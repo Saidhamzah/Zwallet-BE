@@ -36,6 +36,24 @@ module.exports = {
       );
     });
   },
+  getSenderData: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query(
+        `select transfer.amountTransfer as totalTransfer, u1.fullName as sender, u2.device_token as device_token 
+        from transfer 
+        inner join user as u1 on transfer.sendBy=u1.id 
+        inner join user as u2 on transfer.receiver=u2.id 
+        where transfer.id =${id}`,
+        (err, result) => {
+          if (!err) {
+            resolve(result);
+          } else {
+            reject(new Error(err));
+          }
+        }
+      );
+    });
+  },
   transactionDetail: (token, dateStart, until) => {
     return new Promise((resolve, reject) => {
       if (dateStart && until) {

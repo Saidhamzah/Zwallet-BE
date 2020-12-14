@@ -24,6 +24,14 @@ app.use("/zwallet/api/v1/user", UserRoute);
 app.use("/zwallet/api/v1/transaction", TransactionRoute);
 app.use("/zwallet/api/v1/topup", TopupRoute);
 
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./zwallet-noob-firebase-adminsdk-qrxgb-87632dbab4.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

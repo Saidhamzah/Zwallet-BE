@@ -3,7 +3,7 @@ const formResponse = require("../helper/formResponse");
 const transactionRoutes = require("../routes/Transaction");
 const jwt = require("jsonwebtoken");
 const { checkToken } = require("../helper/middleware");
-
+const admin = require('firebase-admin')
 module.exports = {
   transactionDetail: async function (req, res) {
     try {
@@ -94,19 +94,32 @@ module.exports = {
       const checkPin = await transactionModel.checkPin(token.id, pin);
       if (checkPin.length > 0) {
         delete data.pin;
+        // console.log(data,'ini data sebelum trf1')
         await transactionModel.addBalance(data.receiver, data.amountTransfer);
         await transactionModel.updateBalance(token.id, data.balanceLeft);
+        // console.log(data,'ini data sebelum trf2')
         delete data.balanceLeft;
+        // console.log(data,'ini data akan trf')
         const result = await transactionModel.createTransaction(data);
         if (result.affectedRows > 0) {
           res.status(200).send({
             message: "Success Create Transaction",
             data: data,
           });
+          const dataSender = await transactionModel.getSenderData(data.id);
+          if (dataSender) {
+            await admin.messaging().sendToDevice(dataSender[0].device_token, {
+              notification: {
+                title: "Transfer Money",
+                body: `Transfer income RP.${dataSender[0].totalTransfer} from ${dataSender[0].sender} `,
+              },
+            });
+          }
         } else {
           formResponse([], res, 400, "Fill with the right type of value");
         }
       } else {
+        // console.log(data,'ini data gagal trf')
         formResponse([], res, 400, "Wrong Pin");
       }
     } catch (error) {

@@ -18,16 +18,30 @@ module.exports = {
       formResponse([], res, 406, "Password must be more than 8 character");
     }
   },
-  login: (req, res) => {
-    const { email, password } = req.body;
+  login: async function (req, res) {
+    try {
+      const { email, password, device_token } = req.body;
     console.log(email, password);
     if (email && password) {
-      authModel
-        .login(email, password)
-        .then((data) => formResponse(data, res, 200, "Succes"))
-        .catch(() => formResponse([], res, 404, "failed"));
+      const login = await authModel.login( email, password)
+      console.log(login)
+      if(login){
+        console.log(email, device_token)
+        const device= await authModel.addDeviceToken(email, device_token)
+        if(device.affectedRows>0){
+          formResponse([], res, 200, "Succes");
+          }
+          else{
+           formResponse([], res, 404, "failed insert device token");
+          }
+      }else{
+        formResponse([], res, 404, "failed");
+      }
     } else {
       formResponse([], res, 404, "Fill all fields");
+    }} 
+    catch (error) {
+      formResponse([], res, 500, error.message);
     }
   },
   createPin: (req, res) => {

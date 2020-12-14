@@ -52,7 +52,7 @@ module.exports = {
   patchUser: (req, res) => {
     // console.log(req.token);
     const { id } = req.token;
-    const uploadImage = multer({ storage: storage }).single("images");
+    const uploadImage = multer({ storage: storage }).single("img");
     uploadImage(req, res, (err) => {
       console.log(req.file, "controller");
       console.log(req.body, "controller");
@@ -67,8 +67,7 @@ module.exports = {
         if (mime == false) {
           formResponse([], res, 400, "File is not Image");
         } else {
-          if (!err) {
-            const imageName = `${process.env.BASE_URI}/images/${req.file.filename}`;
+            const imageName = `images/${req.file.filename}`;
             userModel
               .patchUser(id, req.body, imageName)
               .then((data) => {
@@ -77,9 +76,7 @@ module.exports = {
               .catch((err) => {
                 formResponse(err, res, 400, "Failed change Photo");
               });
-          } else {
-            formResponse(err, res, 400, err.message);
-          }
+          
         }
       }
     });
@@ -98,7 +95,7 @@ module.exports = {
       const search = req.query.search || "";
       const sortBy = req.query.sortBy || "dateTransfer";
       const sortType = req.query.sortType || "desc";
-      const limit = req.query.limit || 50;
+      const limit = req.query.limit || 5;
       const page = req.query.page || 0;
       const token = req.token;
       // console.log(token);
@@ -112,19 +109,12 @@ module.exports = {
       // console.log(history.length,"result")
       if (result.length > 0) {
         // formResponse(token, res, 200, "success get data");
-        if (history.length > 0) {
           res.status(200).send({
             success: true,
             message: "success get data",
             data: result,
           });
-        } else {
-          res.status(200).send({
-            success: true,
-            message: "success get data",
-            data: result,
-          });
-        }
+        
       } else {
         formResponse([], res, 400, " Data Not Found");
       }
@@ -210,7 +200,7 @@ module.exports = {
     try {
       const {id} = req.token;
       const {phoneNumber} = req.body;
-      console.log(phoneNumber,id)
+      console.log(req.body,id)
       const result = await userModel.updatePhone(id, phoneNumber);
       if (result.affectedRows > 0) {
         res.status(200).send({

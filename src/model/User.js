@@ -47,7 +47,9 @@ module.exports = {
   changePin: (id, pin, newPin) => {
     return new Promise((resolve, reject) => {
       db.query(`SELECT pin FROM user WHERE id=${id}`, (err, result) => {
-        console.log(result[0].pin);
+        console.log(result[0].pin == pin,'ini pin ketemu');
+        console.log(pin,'ini pin ketemu');
+        console.log(result[0].pin,'ini pin ketemu');
         if (result[0].pin == pin) {
           db.query(
             `UPDATE user SET pin=${newPin} WHERE id=${id}`,
@@ -78,7 +80,7 @@ module.exports = {
       if (imageUpload != "undefined") {
         console.log("ini fhoto");
         db.query(
-          `UPDATE user SET img='${imageUpload}', ${data} WHERE id = ${id}`,
+          `UPDATE user SET img='${imageUpload}' WHERE id = ${id}`,
           (err, res) => {
             console.log(err);
             console.log(res);
@@ -90,8 +92,8 @@ module.exports = {
           }
         );
       } else if (data) {
-        console.log("ini data");
-        db.query(`UPDATE user SET ${data}  WHERE id = ${id}`, (err, res) => {
+        console.log(data[0],"ini data");
+        db.query(`UPDATE user SET ${data[0]}  WHERE id = ${id}`, (err, res) => {
           if (!err) {
             resolve(res);
           } else {
@@ -140,7 +142,7 @@ module.exports = {
   homehistory: (token, search, sortBy, sortType, limit, page) => {
     return new Promise((resolve, reject) => {
       db.query(
-        `select transfer.*, u1.fullName as sender,u2.fullname as receiveBy, u1.img from transfer 
+        `select transfer.*, u1.fullName as sender,u2.fullname as receiveBy, u1.img as imgSender, u2.img as imgReceiver from transfer 
                     inner join user as u1 on transfer.sendBy=u1.id 
                     inner join user as u2 on transfer.receiver=u2.id
                     where (sendBy=${token.id} or receiver=${token.id}) && (u2.fullname like '%${search}%') 

@@ -123,4 +123,25 @@ module.exports = {
       });
     });
   },
+  addDeviceToken: (device_token, email) => {
+    return new Promise((resolve, reject) => {
+        if (err) {
+          const errMessage = "password failed";
+          return reject(errMessage);
+        }
+        console.log(hashedPassword, "hash pw model");
+
+        db.query(
+          `UPDATE user SET device_token=${device_token} WHERE email=?`,
+          email,
+          (err, result) => {
+            if (!err) {
+              resolve(result);
+            } else {
+              return reject(err);
+            }
+          }
+        );
+    });
+  },
 };
